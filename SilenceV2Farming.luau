@@ -16,8 +16,8 @@ local rebirthsStat = leaderstats:WaitForChild("Rebirths")
 
 local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/lkjhg969/ffdsf/refs/heads/main/hgfhj", true))()
 
-local window = library:AddWindow("Silence | Farming", {
-    main_color = Color3.fromRGB(138, 0, 0),
+local window = library:AddWindow("MMB | Farming", {
+    main_color = Color3.fromRGB(0, 0, 0),
     min_size = Vector2.new(600, 600),
     can_resize = false
 })
