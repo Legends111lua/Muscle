@@ -14,7 +14,7 @@ local muscleEvent = player:WaitForChild("muscleEvent")
 local leaderstats = player:WaitForChild("leaderstats")
 local rebirthsStat = leaderstats:WaitForChild("Rebirths")
 
-local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/lkjhg969/ffdsf/refs/heads/main/hgfhj", true))()
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Legends111lua/Muscle/refs/heads/main/template", true))()
 
 local window = library:AddWindow("MMB | Farming", {
     main_color = Color3.fromRGB(0, 0, 0),
