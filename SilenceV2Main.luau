@@ -909,7 +909,7 @@ end)
 comboSwitch:Set(false)
 
 KillingTab:AddButton("Disable Eggs",function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/244ihssp/IlIIS/refs/heads/main/1"))()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Legends111lua/Muscle/refs/heads/main/eggsla"))()
 end)
 
 KillingTab:AddLabel("Auto Kill:").TextSize = 22
