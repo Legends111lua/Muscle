@@ -658,15 +658,15 @@ local function activateProteinEgg()
 end
 
 local running = false
+local lastUsed = 0
 
 task.spawn(function()
     while true do
-        if running then
+        if running and (tick() - lastUsed >= 1800) then
             activateProteinEgg()
-            task.wait(1800)
-        else
-            task.wait(1)
+            lastUsed = tick()
         end
+        task.wait(1)
     end
 end)
 
@@ -674,6 +674,7 @@ local switch = FarmingTab:AddSwitch("Auto Egg", function(state)
     running = state
     if state then
         activateProteinEgg()
+        lastUsed = tick()
     end
 end)
 switch:Set(false)
