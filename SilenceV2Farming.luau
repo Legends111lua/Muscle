@@ -582,7 +582,7 @@ FarmingTab:AddLabel("Fast Farm (Recommended Speed: 20)").TextSize = 20
 
 local PING_THRESHOLD = 300
 local TUNE_INTERVAL = 3
-local MAX_REPS = 100
+local MAX_REPS = 1000
 local MIN_REPS = 1
 
 local repsPerTick = 1
