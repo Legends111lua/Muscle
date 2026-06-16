@@ -18,7 +18,7 @@ local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Legen
 local window = library:AddWindow("MMB | Farming", {
     main_color = Color3.fromRGB(0, 0, 0),
     min_size = Vector2.new(600, 600),
-    can_resize = false
+    can_resize = true
 })
 
 local replicatedStorage = game:GetService("ReplicatedStorage")
@@ -843,9 +843,6 @@ FarmingTab:AddButton("Anti Lag", function()
     darkenSky()
 end)
 
-FarmingTab:AddLabel("")
-local petLabel = FarmingTab:AddLabel("Pets:")
-petLabel.TextSize = 20
 FarmingTab:AddButton("Equip Swift Samurai", function()
     unequipPets()
     equipPetsByName("Swift Samurai")
