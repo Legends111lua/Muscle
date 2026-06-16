@@ -198,17 +198,17 @@ local function doRebirth()
         for _ = 1, reps do
             muscleEvent:FireServer("rep")
         end
-        task.wait(0.02)
+        task.wait(0.01)
     end
     
     if isRunning and player.leaderstats.Strength.Value >= strengthTarget then
         managePets("Tribal Overlord")
-        task.wait(0.25)
+        task.wait(0.1)
         
         local before = rebirthsStat.Value
         repeat
             replicatedStorage.rEvents.rebirthRemote:InvokeServer("rebirthRequest")
-            task.wait(0.05)
+            task.wait(0.03)
         until rebirthsStat.Value > before or not isRunning
     end
 end
@@ -217,7 +217,7 @@ local function fastRebirthLoop()
     while isRunning do
         managePets("Swift Samurai")
         doRebirth()
-        task.wait(0.5)
+        task.wait(0.1)
     end
 end
 
