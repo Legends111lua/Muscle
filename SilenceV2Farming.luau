@@ -17,7 +17,7 @@ local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Legen
 
 local window = library:AddWindow("MMB | Farming", {
     main_color = Color3.fromRGB(0, 0, 0),
-    min_size = Vector2.new(600, 700),
+    min_size = Vector2.new(600, 900),
     can_resize = true
 })
 
@@ -582,7 +582,7 @@ FarmingTab:AddLabel("Fast Farm (Recommended Speed: 20)").TextSize = 20
 
 local PING_THRESHOLD = 300
 local TUNE_INTERVAL = 3
-local MAX_REPS = 30
+local MAX_REPS = 100
 local MIN_REPS = 1
 
 local repsPerTick = 1
@@ -636,12 +636,12 @@ end, { placeholder = "1" })
 FarmingTab:AddSwitch("Fast Rep", function(state)
     if state and not runFastRep then
         runFastRep = true
-        if autoTune then
-            repsPerTick = MAX_REPS
-        end
+        autoTune = true
+        repsPerTick = MAX_REPS
         task.spawn(fastRepLoop)
     elseif not state and runFastRep then
         runFastRep = false
+        autoTune = false
     end
 end)
 
