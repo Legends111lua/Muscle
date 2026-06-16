@@ -17,7 +17,7 @@ local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Legen
 
 local window = library:AddWindow("MMB | Farming", {
     main_color = Color3.fromRGB(0, 0, 0),
-    min_size = Vector2.new(600, 900),
+    min_size = Vector2.new(600, 700),
     can_resize = true
 })
 
