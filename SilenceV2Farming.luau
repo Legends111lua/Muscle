@@ -594,29 +594,6 @@ local function getPing()
     return pingStat and pingStat:GetValue() or 0
 end
 
-local function getAveragePing(samples, interval)
-    local total = 0
-    for i = 1, samples do
-        total = total + getPing()
-        task.wait(interval / samples)
-    end
-    return total / samples
-end
-
-local function autoTuneLoop()
-    repsPerTick = MAX_REPS
-    task.wait(TUNE_INTERVAL)
-    while autoTune and runFastRep do
-        local avgPing = getAveragePing(5, TUNE_INTERVAL)
-        if avgPing > PING_THRESHOLD then
-            repsPerTick = math.max(MIN_REPS, repsPerTick - 1)
-        elseif avgPing < PING_THRESHOLD * 0.8 and repsPerTick < MAX_REPS then
-            repsPerTick = math.min(MAX_REPS, repsPerTick + 1)
-        end
-        task.wait(TUNE_INTERVAL)
-    end
-end
-
 local function fastRepLoop()
     while runFastRep do
         local startTick = tick()
@@ -632,6 +609,21 @@ local function fastRepLoop()
     end
 end
 
+-- Auto tune roda separado sem interferir no loop
+task.spawn(function()
+    while true do
+        task.wait(TUNE_INTERVAL)
+        if autoTune and runFastRep then
+            local ping = getPing()
+            if ping > PING_THRESHOLD then
+                repsPerTick = math.max(MIN_REPS, repsPerTick - 1)
+            elseif ping < PING_THRESHOLD * 0.8 and repsPerTick < MAX_REPS then
+                repsPerTick = math.min(MAX_REPS, repsPerTick + 1)
+            end
+        end
+    end
+end)
+
 FarmingTab:AddTextBox("Rep Speed", function(value)
     if not autoTune then
         local num = tonumber(value)
@@ -644,6 +636,9 @@ end, { placeholder = "1" })
 FarmingTab:AddSwitch("Fast Rep", function(state)
     if state and not runFastRep then
         runFastRep = true
+        if autoTune then
+            repsPerTick = MAX_REPS
+        end
         task.spawn(fastRepLoop)
     elseif not state and runFastRep then
         runFastRep = false
@@ -652,8 +647,8 @@ end)
 
 FarmingTab:AddSwitch("Auto Rep Tune", function(state)
     autoTune = state
-    if state and runFastRep then
-        task.spawn(autoTuneLoop)
+    if state then
+        repsPerTick = MAX_REPS
     end
 end)
 
