@@ -581,7 +581,13 @@ end)
 FarmingTab:AddLabel("")
 FarmingTab:AddLabel("Fast Farm (Recommended Speed: 20)").TextSize = 20
 
+local PING_THRESHOLD = 300
+local TUNE_INTERVAL = 3
+local MAX_REPS = 30
+local MIN_REPS = 1
+
 local repsPerTick = 1
+local autoTune = false
 
 local function getPing()
     local stats = game:GetService("Stats")
@@ -589,14 +595,28 @@ local function getPing()
     return pingStat and pingStat:GetValue() or 0
 end
 
-FarmingTab:AddTextBox("Rep Speed", function(value)
-    local num = tonumber(value)
-    if num and num > 0 then
-        repsPerTick = math.floor(num)
+local function getAveragePing(samples, interval)
+    local total = 0
+    for i = 1, samples do
+        total = total + getPing()
+        task.wait(interval / samples)
     end
-end, {
-    placeholder = "1",
-})
+    return total / samples
+end
+
+local function autoTuneLoop()
+    repsPerTick = MAX_REPS
+    task.wait(TUNE_INTERVAL)
+    while autoTune and runFastRep do
+        local avgPing = getAveragePing(5, TUNE_INTERVAL)
+        if avgPing > PING_THRESHOLD then
+            repsPerTick = math.max(MIN_REPS, repsPerTick - 1)
+        elseif avgPing < PING_THRESHOLD * 0.8 and repsPerTick < MAX_REPS then
+            repsPerTick = math.min(MAX_REPS, repsPerTick + 1)
+        end
+        task.wait(TUNE_INTERVAL)
+    end
+end
 
 local function fastRepLoop()
     while runFastRep do
@@ -613,6 +633,15 @@ local function fastRepLoop()
     end
 end
 
+FarmingTab:AddTextBox("Rep Speed", function(value)
+    if not autoTune then
+        local num = tonumber(value)
+        if num and num > 0 then
+            repsPerTick = math.floor(num)
+        end
+    end
+end, { placeholder = "1" })
+
 FarmingTab:AddSwitch("Fast Rep", function(state)
     if state and not runFastRep then
         runFastRep = true
@@ -620,6 +649,24 @@ FarmingTab:AddSwitch("Fast Rep", function(state)
     elseif not state and runFastRep then
         runFastRep = false
     end
+end)
+
+FarmingTab:AddSwitch("Auto Rep Tune", function(state)
+    autoTune = state
+    if state and runFastRep then
+        task.spawn(autoTuneLoop)
+    end
+end)
+
+local repLabel = FarmingTab:AddLabel("Current Reps: 1")
+repLabel.TextSize = 17
+
+task.spawn(function()
+    while true do
+        repLabel.Text = "Current Reps: " .. repsPerTick .. (autoTune and " (Auto)" or " (Manual)")
+        task.wait(0.5)
+    end
+end)
 end)
 
 
@@ -833,4 +880,3 @@ infoTab:AddLabel("")
 local wLabel = infoTab:AddLabel("VERSION//2.0.0")
 wLabel.TextSize = 40
 wLabel.Font = Enum.Font.Arcade
-
