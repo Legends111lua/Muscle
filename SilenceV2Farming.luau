@@ -843,6 +843,9 @@ FarmingTab:AddButton("Anti Lag", function()
     darkenSky()
 end)
 
+FarmingTab:AddLabel("")
+local petLabel = FarmingTab:AddLabel("Pets:")
+petLabel.TextSize = 20
 FarmingTab:AddButton("Equip Swift Samurai", function()
     unequipPets()
     equipPetsByName("Swift Samurai")
