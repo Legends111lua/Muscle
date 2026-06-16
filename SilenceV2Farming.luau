@@ -102,6 +102,8 @@ local function updateUI(forceUpdate)
     timeLabel.TextColor3 = isRunning and Color3.fromRGB(50, 255, 50) or Color3.fromRGB(255, 50, 50)
 end
 
+local lastRebirthTime = tick()
+local lastRebirthValue = rebirthsStat.Value
 
 local paceHistoryHour = {}
 local paceHistoryDay = {}
@@ -879,3 +881,4 @@ infoTab:AddLabel("")
 local wLabel = infoTab:AddLabel("VERSION//2.0.0")
 wLabel.TextSize = 40
 wLabel.Font = Enum.Font.Arcade
+
