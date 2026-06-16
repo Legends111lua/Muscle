@@ -1,4 +1,3 @@
-
 local Players = game:GetService("Players")
 local HttpService = game:GetService("HttpService")
 
@@ -15,7 +14,6 @@ local leaderstats = player:WaitForChild("leaderstats")
 local rebirthsStat = leaderstats:WaitForChild("Rebirths")
 
 local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Legends111lua/Muscle/refs/heads/main/template", true))()
-
 
 local window = library:AddWindow("MMB | Farming", {
     main_color = Color3.fromRGB(0, 0, 0),
@@ -880,4 +878,3 @@ infoTab:AddLabel("")
 local wLabel = infoTab:AddLabel("VERSION//2.0.0")
 wLabel.TextSize = 40
 wLabel.Font = Enum.Font.Arcade
-
