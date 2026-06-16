@@ -1,4 +1,3 @@
-
 local Players = game:GetService("Players")
 local HttpService = game:GetService("HttpService")
 
@@ -101,8 +100,6 @@ local function updateUI(forceUpdate)
     timeLabel.TextColor3 = isRunning and Color3.fromRGB(50, 255, 50) or Color3.fromRGB(255, 50, 50)
 end
 
-local lastRebirthTime = tick()
-local lastRebirthValue = rebirthsStat.Value
 
 local paceHistoryHour = {}
 local paceHistoryDay = {}
