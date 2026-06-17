@@ -712,7 +712,7 @@ local lastUsed = 0
 
 task.spawn(function()
     while true do
-        if running and (tick() - lastUsed >= 1800) then
+        if running and (tick() - lastUsed >= 1860) then
             activateProteinEgg()
             lastUsed = tick()
         end
