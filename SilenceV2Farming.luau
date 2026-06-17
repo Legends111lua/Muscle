@@ -700,7 +700,7 @@ local function equipPetsByName(name)
 end
 
 local function activateProteinEgg()
-    local tool = Player.Character:FindFirstChild("Protein Egg") or Player.Backpack:FindFirstChild("Protein Egg")
+    local tool = Player.Backpack:FindFirstChild("Protein Egg")
     if tool then
         muscleEvent:FireServer("proteinEgg", tool)
     end
