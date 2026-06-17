@@ -1,4 +1,3 @@
-
 local Players = game:GetService("Players")
 local HttpService = game:GetService("HttpService")
 
@@ -701,9 +700,10 @@ end
 
 local function activateProteinEgg()
     local tool = Player.Character:FindFirstChild("Protein Egg") or Player.Backpack:FindFirstChild("Protein Egg")
-
+    print("Egg encontrado:", tool, tool and tool.Parent)
     if tool then
         muscleEvent:FireServer("proteinEgg", tool)
+        print("FireServer enviado")
     end
 end
 
