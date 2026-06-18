@@ -712,6 +712,7 @@ task.spawn(function()
         if running then
             local boostTimer = player:WaitForChild("boostTimersFolder"):FindFirstChild("Protein Egg")
             local timeLeft = boostTimer and boostTimer.Value or 0
+            print("TimeLeft:", timeLeft, "Running:", running)
             if timeLeft <= 0 then
                 activateProteinEgg()
             end
