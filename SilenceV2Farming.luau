@@ -701,7 +701,11 @@ end
 local function activateProteinEgg()
     local tool = player.Character:FindFirstChild("Protein Egg") or player.Backpack:FindFirstChild("Protein Egg")
     if tool then
+        runFastRep = false
+        task.wait(0.5)
         muscleEvent:FireServer("proteinEgg", tool)
+        task.wait(0.5)
+        runFastRep = true
     end
 end
 
