@@ -699,11 +699,9 @@ local function equipPetsByName(name)
 end
 
 local function activateProteinEgg()
-    local tool = Player.Character:FindFirstChild("Protein Egg") or Player.Backpack:FindFirstChild("Protein Egg")
-    print("Egg encontrado:", tool, tool and tool.Parent)
+    local tool = player.Character:FindFirstChild("Protein Egg") or player.Backpack:FindFirstChild("Protein Egg")
     if tool then
         muscleEvent:FireServer("proteinEgg", tool)
-        print("FireServer enviado")
     end
 end
 
@@ -712,11 +710,14 @@ local lastUsed = 0
 
 task.spawn(function()
     while true do
-        if running and (tick() - lastUsed >= 1860) then
-            activateProteinEgg()
-            lastUsed = tick()
+        if running then
+            local boostTimer = player:WaitForChild("boostTimersFolder"):FindFirstChild("Protein Egg")
+            local timeLeft = boostTimer and boostTimer.Value or 0
+            if timeLeft <= 0 then
+                activateProteinEgg()
+            end
         end
-        task.wait(1)
+        task.wait(5)
     end
 end)
 
