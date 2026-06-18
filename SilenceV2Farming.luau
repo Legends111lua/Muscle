@@ -596,16 +596,19 @@ end
 
 local function fastRepLoop()
     while runFastRep do
-        local startTick = tick()
-        while tick() - startTick < 0.75 and runFastRep do
-            for i = 1, repsPerTick do
-                muscleEvent:FireServer("rep")
+        if not eatingEgg then
+            local startTick = tick()
+            while tick() - startTick < 0.75 and runFastRep and not eatingEgg do
+                for i = 1, repsPerTick do
+                    muscleEvent:FireServer("rep")
+                end
+                task.wait(0.02)
             end
-            task.wait(0.02)
         end
         while runFastRep and getPing() >= 350 do
             task.wait(1)
         end
+        task.wait(0.01)
     end
 end
 
@@ -698,14 +701,16 @@ local function equipPetsByName(name)
     end
 end
 
+local eatingEgg = false
+
 local function activateProteinEgg()
     local tool = player.Character:FindFirstChild("Protein Egg") or player.Backpack:FindFirstChild("Protein Egg")
     if tool then
-        runFastRep = false
+        eatingEgg = true
         task.wait(0.5)
         muscleEvent:FireServer("proteinEgg", tool)
         task.wait(0.5)
-        runFastRep = true
+        eatingEgg = false
     end
 end
 
