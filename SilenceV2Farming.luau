@@ -596,12 +596,14 @@ end
 
 local function fastRepLoop()
     while runFastRep do
+        if _G_lock then task.wait(0.1) continue end
         local startTick = tick()
         while tick() - startTick < 0.75 and runFastRep do
             for i = 1, repsPerTick do
                 muscleEvent:FireServer("rep")
+                task.wait(0.015) -- wait entre cada rep individual
             end
-            task.wait(0.02)
+            task.wait(0.05) -- wait entre batches, era 0.02
         end
         while runFastRep and getPing() >= 350 do
             task.wait(1)
