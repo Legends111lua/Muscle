@@ -17,7 +17,7 @@ local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Legen
 
 local window = library:AddWindow("MMB | Farming", {
     main_color = Color3.fromRGB(0, 0, 0),
-    min_size = Vector2.new(600, 670),
+    min_size = Vector2.new(600, 600),
     can_resize = false
 })
 
@@ -197,17 +197,17 @@ local function doRebirth()
         for _ = 1, reps do
             muscleEvent:FireServer("rep")
         end
-        task.wait(0.05)
+        task.wait(0.02)
     end
     
     if isRunning and player.leaderstats.Strength.Value >= strengthTarget then
         managePets("Tribal Overlord")
-        task.wait(0.3)
+        task.wait(0.25)
         
         local before = rebirthsStat.Value
         repeat
             replicatedStorage.rEvents.rebirthRemote:InvokeServer("rebirthRequest")
-            task.wait(0.2)
+            task.wait(0.05)
         until rebirthsStat.Value > before or not isRunning
     end
 end
@@ -216,7 +216,7 @@ local function fastRebirthLoop()
     while isRunning do
         managePets("Swift Samurai")
         doRebirth()
-        task.wait(0.1)
+        task.wait(0.5)
     end
 end
 
@@ -580,13 +580,7 @@ end)
 FarmingTab:AddLabel("")
 FarmingTab:AddLabel("Fast Farm (Recommended Speed: 20)").TextSize = 20
 
-local PING_THRESHOLD = 300
-local TUNE_INTERVAL = 3
-local MAX_REPS = 80
-local MIN_REPS = 1
-
-local repsPerTick = 20
-local autoTune = false
+local repsPerTick = 1
 
 local function getPing()
     local stats = game:GetService("Stats")
@@ -594,16 +588,23 @@ local function getPing()
     return pingStat and pingStat:GetValue() or 0
 end
 
+FarmingTab:AddTextBox("Rep Speed", function(value)
+    local num = tonumber(value)
+    if num and num > 0 then
+        repsPerTick = math.floor(num)
+    end
+end, {
+    placeholder = "1",
+})
+
 local function fastRepLoop()
     while runFastRep do
-        if _G_lock then task.wait(0.1) continue end
         local startTick = tick()
         while tick() - startTick < 0.75 and runFastRep do
             for i = 1, repsPerTick do
                 muscleEvent:FireServer("rep")
-                task.wait(0.015) -- wait entre cada rep individual
             end
-            task.wait(0.05) -- wait entre batches, era 0.02
+            task.wait(0.02)
         end
         while runFastRep and getPing() >= 350 do
             task.wait(1)
@@ -611,64 +612,12 @@ local function fastRepLoop()
     end
 end
 
-task.spawn(function()
-    while true do
-        task.wait(TUNE_INTERVAL)
-        if autoTune and runFastRep then
-            local ping = getPing()
-            if ping > PING_THRESHOLD then
-                repsPerTick = math.max(MIN_REPS, repsPerTick - 1)
-            elseif ping < PING_THRESHOLD * 0.8 and repsPerTick < MAX_REPS then
-                repsPerTick = math.min(MAX_REPS, repsPerTick + 1)
-            end
-        end
-    end
-end)
-
-FarmingTab:AddTextBox("Rep Speed", function(value)
-    if not autoTune then
-        local num = tonumber(value)
-        if num and num > 0 then
-            repsPerTick = math.floor(num)
-        end
-    end
-end, { placeholder = "20" })
-
-local autoTuneSwitch
-
 FarmingTab:AddSwitch("Fast Rep", function(state)
     if state and not runFastRep then
         runFastRep = true
-        if autoTune then
-            repsPerTick = MAX_REPS
-        end
         task.spawn(fastRepLoop)
     elseif not state and runFastRep then
         runFastRep = false
-    end
-end)
-
-autoTuneSwitch = FarmingTab:AddSwitch("Auto Rep Tune", function(state)
-    autoTune = state
-    if state then
-        repsPerTick = MAX_REPS
-        if not runFastRep then
-            runFastRep = true
-            task.spawn(fastRepLoop)
-        end
-    else
-        runFastRep = false
-        repsPerTick = 20
-    end
-end)
-
-local repLabel = FarmingTab:AddLabel("Current Reps: 20 (Manual)")
-repLabel.TextSize = 17
-
-task.spawn(function()
-    while true do
-        repLabel.Text = "Current Reps: " .. repsPerTick .. (autoTune and " (Auto)" or " (Manual)")
-        task.wait(0.5)
     end
 end)
 
@@ -703,15 +652,7 @@ end
 local function activateProteinEgg()
     local tool = Player.Character:FindFirstChild("Protein Egg") or Player.Backpack:FindFirstChild("Protein Egg")
     if tool then
-        local wasRunning = runFastRep
-        runFastRep = false
-        task.wait(0.3)
         muscleEvent:FireServer("proteinEgg", tool)
-        task.wait(0.5)
-        if wasRunning then
-            runFastRep = true
-            task.spawn(fastRepLoop)
-        end
     end
 end
 
