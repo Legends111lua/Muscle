@@ -207,7 +207,7 @@ local function doRebirth()
         local before = rebirthsStat.Value
         repeat
             replicatedStorage.rEvents.rebirthRemote:InvokeServer("rebirthRequest")
-            task.wait(0.03)
+            task.wait(0.2)
         until rebirthsStat.Value > before or not isRunning
     end
 end
