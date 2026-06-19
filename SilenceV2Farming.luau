@@ -197,12 +197,12 @@ local function doRebirth()
         for _ = 1, reps do
             muscleEvent:FireServer("rep")
         end
-        task.wait(0.01)
+        task.wait(0.05)
     end
     
     if isRunning and player.leaderstats.Strength.Value >= strengthTarget then
         managePets("Tribal Overlord")
-        task.wait(0.1)
+        task.wait(0.3)
         
         local before = rebirthsStat.Value
         repeat
