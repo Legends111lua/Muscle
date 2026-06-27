@@ -1,0 +1,307 @@
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local VirtualInputManager = game:GetService("VirtualInputManager")
+
+repeat task.wait(1) until game:IsLoaded()
+task.wait(5)
+
+local player = Players.LocalPlayer
+local Player = player
+
+repeat task.wait(0.5) until player.Character
+repeat task.wait(0.5) until player:FindFirstChild("muscleEvent")
+repeat task.wait(0.5) until player:FindFirstChild("leaderstats")
+repeat task.wait(0.5) until player:FindFirstChild("petsFolder")
+
+local muscleEvent = player:WaitForChild("muscleEvent")
+local leaderstats = player:WaitForChild("leaderstats")
+local rebirthsStat = leaderstats:WaitForChild("Rebirths")
+
+-- Anti Lag
+local playerGui = player:WaitForChild("PlayerGui")
+local lighting = game:GetService("Lighting")
+
+for _, gui in pairs(playerGui:GetChildren()) do
+    if gui:IsA("ScreenGui") then gui:Destroy() end
+end
+
+for _, v in pairs(lighting:GetChildren()) do
+    if v:IsA("Sky") then v:Destroy() end
+end
+
+local darkSky = Instance.new("Sky")
+darkSky.Name = "DarkSky"
+darkSky.SkyboxBk = "rbxassetid://0"
+darkSky.SkyboxDn = "rbxassetid://0"
+darkSky.SkyboxFt = "rbxassetid://0"
+darkSky.SkyboxLf = "rbxassetid://0"
+darkSky.SkyboxRt = "rbxassetid://0"
+darkSky.SkyboxUp = "rbxassetid://0"
+darkSky.Parent = lighting
+lighting.Brightness = 0
+lighting.ClockTime = 0
+lighting.OutdoorAmbient = Color3.new(0,0,0)
+lighting.Ambient = Color3.new(0,0,0)
+lighting.FogColor = Color3.new(0,0,0)
+lighting.FogEnd = 100
+
+for _, obj in pairs(workspace:GetDescendants()) do
+    if obj:IsA("ParticleEmitter") or obj:IsA("PointLight") or obj:IsA("SpotLight") or obj:IsA("SurfaceLight") then
+        obj:Destroy()
+    end
+end
+
+task.spawn(function()
+    while true do
+        task.wait(5)
+        if not lighting:FindFirstChild("DarkSky") then darkSky:Clone().Parent = lighting end
+        lighting.Brightness = 0
+        lighting.ClockTime = 0
+        lighting.OutdoorAmbient = Color3.new(0,0,0)
+        lighting.Ambient = Color3.new(0,0,0)
+        lighting.FogColor = Color3.new(0,0,0)
+        lighting.FogEnd = 100
+    end
+end)
+
+-- Set Size 1
+task.spawn(function()
+    while true do
+        ReplicatedStorage.rEvents.changeSpeedSizeRemote:InvokeServer("changeSize", 1)
+        wait(0.01)
+    end
+end)
+
+-- Jungle Lift
+local char = player.Character or player.CharacterAdded:Wait()
+local hrp = char:WaitForChild("HumanoidRootPart")
+hrp.CFrame = CFrame.new(-8642.396484375, 6.7980651855, 2086.1030273)
+task.wait(1)
+for i = 1, 10 do
+    VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
+    task.wait(0.1)
+    VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
+    task.wait(0.1)
+end
+task.wait(1)
+
+-- Auto Shake
+task.spawn(function()
+    while true do
+        local tool = player.Character:FindFirstChild("Tropical Shake") or player.Backpack:FindFirstChild("Tropical Shake")
+        if tool then
+            muscleEvent:FireServer("tropicalShake", tool)
+        end
+        task.wait(450)
+    end
+end)
+
+-- Lock Position
+task.wait(2)
+
+local lockEnabled = true
+task.spawn(function()
+    local char = player.Character or player.CharacterAdded:Wait()
+    local hrp = char:WaitForChild("HumanoidRootPart")
+    local lockPos = hrp.Position
+    while true do
+        if lockEnabled then
+            hrp.Velocity = Vector3.new(0,0,0)
+            hrp.RotVelocity = Vector3.new(0,0,0)
+            hrp.CFrame = CFrame.new(lockPos)
+        end
+        wait(0.05)
+    end
+end)
+
+-- HUD de Rebirth Pace
+local function formatNumber(num)
+    if num >= 1e15 then return string.format("%.2fQ", num/1e15) end
+    if num >= 1e12 then return string.format("%.2fT", num/1e12) end
+    if num >= 1e9 then return string.format("%.2fB", num/1e9) end
+    if num >= 1e6 then return string.format("%.2fM", num/1e6) end
+    if num >= 1e3 then return string.format("%.2fK", num/1e3) end
+    return string.format("%.0f", num)
+end
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "RebirthHUD"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = playerGui
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 420, 0, 130)
+frame.Position = UDim2.new(0, 10, 0, 10)
+frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+frame.BackgroundTransparency = 0.4
+frame.BorderSizePixel = 0
+frame.Parent = screenGui
+
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 8)
+corner.Parent = frame
+
+local function makeLabel(text, posY)
+    local lbl = Instance.new("TextLabel")
+    lbl.Size = UDim2.new(1, -10, 0, 25)
+    lbl.Position = UDim2.new(0, 5, 0, posY)
+    lbl.BackgroundTransparency = 1
+    lbl.TextColor3 = Color3.fromRGB(255, 255, 255)
+    lbl.TextSize = 15
+    lbl.Font = Enum.Font.GothamBold
+    lbl.TextXAlignment = Enum.TextXAlignment.Left
+    lbl.Text = text
+    lbl.Parent = frame
+    return lbl
+end
+
+local rebirthsLabel = makeLabel("Rebirths: 0 | Gained: 0", 5)
+local timeLabel = makeLabel("0d 0h 0m 0s - Rebirthing", 30)
+local paceLabel = makeLabel("Pace: 0 / Hour | 0 / Day | 0 / Week", 55)
+local avgPaceLabel = makeLabel("Average Pace: 0 / Hour | 0 / Day | 0 / Week", 80)
+
+timeLabel.TextColor3 = Color3.fromRGB(50, 255, 50)
+
+local initialRebirths = rebirthsStat.Value
+local startTime = tick()
+local paceHistoryHour = {}
+local paceHistoryDay = {}
+local paceHistoryWeek = {}
+local maxHistoryLength = 20
+local rebirthCount = 0
+local lastRebirthTime = tick()
+local lastRebirthValue = rebirthsStat.Value
+
+local function average(tbl)
+    local sum = 0
+    for _, v in ipairs(tbl) do sum = sum + v end
+    return #tbl > 0 and (sum / #tbl) or 0
+end
+
+rebirthsStat:GetPropertyChangedSignal("Value"):Connect(function()
+    rebirthCount += 1
+    local gained = rebirthsStat.Value - initialRebirths
+    rebirthsLabel.Text = string.format("Rebirths: %s | Gained: %s", formatNumber(rebirthsStat.Value), formatNumber(gained))
+
+    if rebirthCount < 2 then
+        lastRebirthTime = tick()
+        lastRebirthValue = rebirthsStat.Value
+        return
+    end
+
+    local now = tick()
+    local gainedSinceLast = rebirthsStat.Value - lastRebirthValue
+    if gainedSinceLast > 0 then
+        local avgTimePerRebirth = (now - lastRebirthTime) / gainedSinceLast
+        local paceHour = 3600 / avgTimePerRebirth
+        local paceDay = 86400 / avgTimePerRebirth
+        local paceWeek = 604800 / avgTimePerRebirth
+
+        paceLabel.Text = string.format("Pace: %s / Hour | %s / Day | %s / Week",
+            formatNumber(paceHour), formatNumber(paceDay), formatNumber(paceWeek))
+
+        table.insert(paceHistoryHour, paceHour)
+        table.insert(paceHistoryDay, paceDay)
+        table.insert(paceHistoryWeek, paceWeek)
+
+        if #paceHistoryHour > maxHistoryLength then
+            table.remove(paceHistoryHour, 1)
+            table.remove(paceHistoryDay, 1)
+            table.remove(paceHistoryWeek, 1)
+        end
+
+        avgPaceLabel.Text = string.format("Average Pace: %s / Hour | %s / Day | %s / Week",
+            formatNumber(average(paceHistoryHour)), formatNumber(average(paceHistoryDay)), formatNumber(average(paceHistoryWeek)))
+
+        lastRebirthTime = now
+        lastRebirthValue = rebirthsStat.Value
+    end
+end)
+
+task.spawn(function()
+    while true do
+        local elapsed = tick() - startTime
+        local days = math.floor(elapsed / 86400)
+        local hours = math.floor((elapsed % 86400) / 3600)
+        local minutes = math.floor((elapsed % 3600) / 60)
+        local seconds = math.floor(elapsed % 60)
+        timeLabel.Text = string.format("%dd %dh %dm %ds - Rebirthing", days, hours, minutes, seconds)
+        task.wait(1)
+    end
+end)
+
+-- Fast Rebirth
+local isRunning = true
+local lastRebirthTick = tick()
+local REBIRTH_TIMEOUT = 300
+
+local function managePets(petName)
+    for _, folder in pairs(player.petsFolder:GetChildren()) do
+        if folder:IsA("Folder") then
+            for _, pet in pairs(folder:GetChildren()) do
+                ReplicatedStorage.rEvents.equipPetEvent:FireServer("unequipPet", pet)
+            end
+        end
+    end
+    task.wait(0.1)
+    for _, pet in pairs(player.petsFolder.Unique:GetChildren()) do
+        if pet.Name == petName then
+            ReplicatedStorage.rEvents.equipPetEvent:FireServer("equipPet", pet)
+        end
+    end
+end
+
+local function doRebirth()
+    local rebirths = rebirthsStat.Value
+    local strengthTarget = 5000 + (rebirths * 2550)
+
+    while isRunning and player.leaderstats.Strength.Value < strengthTarget do
+        local reps = player.MembershipType == Enum.MembershipType.Premium and 8 or 14
+        for _ = 1, reps do
+            muscleEvent:FireServer("rep")
+        end
+        task.wait(0.02)
+    end
+
+    if isRunning and player.leaderstats.Strength.Value >= strengthTarget then
+        managePets("Tribal Overlord")
+        task.wait(0.25)
+
+        local before = rebirthsStat.Value
+        repeat
+            ReplicatedStorage.rEvents.rebirthRemote:InvokeServer("rebirthRequest")
+            task.wait(0.03)
+        until rebirthsStat.Value > before or not isRunning
+
+        if rebirthsStat.Value > before then
+            lastRebirthTick = tick()
+        end
+    end
+end
+
+task.spawn(function()
+    while true do
+        task.wait(30)
+        if isRunning and (tick() - lastRebirthTick) > REBIRTH_TIMEOUT then
+            lastRebirthTick = tick()
+            isRunning = false
+            task.wait(1)
+            isRunning = true
+            task.spawn(function()
+                while isRunning do
+                    managePets("Swift Samurai")
+                    doRebirth()
+                    task.wait(0.5)
+                end
+            end)
+        end
+    end
+end)
+
+task.spawn(function()
+    while isRunning do
+        managePets("Swift Samurai")
+        doRebirth()
+        task.wait(0.5)
+    end
+end)
